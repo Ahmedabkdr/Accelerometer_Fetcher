@@ -44,10 +44,13 @@ const App = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [peripherals, setPeripherals] = useState(new Map());
   const [isConnected, setIsConnected] = useState(false);
+  const [isEating, setIsEating] = useState(false);
   let [currentPeripheral, setCurrentPeripheral] = useState(null);
   const theme = useColorScheme();
   const fileName = 'accelerometer.csv'; //whatever you want to call your file
+  const fileName2 = 'isEating.csv'
   const filePath = `${Dirs.DocumentDir}/${fileName}`;
+  const filePath2 = `${Dirs.DocumentDir}/${fileName2}`;
 
   const updatePeripherals = (key, value) => {
     setPeripherals(new Map(peripherals.set(key, value)));
@@ -129,6 +132,19 @@ const App = () => {
     } else {
       connectPeripheral(peripheral);
     }
+  };
+
+  const toggleEating = () => {
+    if (isEating) {
+      setIsEating(false);
+    } else {
+      setIsEating(true);
+    }
+    RNFetchBlob.fs.writeStream(filePath2, 'utf8', true)
+    .then((stream) => {
+        stream.write(Date.now() + "," + (isEating ? "1" : "0") + '\n')
+        return stream.close()
+    });
   };
 
   const goToPeripheral = (peripheral, navigation) => {
@@ -283,7 +299,7 @@ const App = () => {
   };
 
   const PeripheralScreen = ({navigation}) => {
-    const backgroundColor = "#069400";
+    const backgroundColor = Colors.white;
 
     return (
         <>
@@ -296,6 +312,9 @@ const App = () => {
             <Text style={styles.rssi}>RSSI: {currentPeripheral.rssi}</Text>
             <Text style={styles.peripheralId}>{currentPeripheral.id}</Text>
           </View>
+          <TouchableOpacity style={styles.scanButton} onPress={() => toggleEating()}>
+            <Text style={styles.scanButtonText}>{isEating ? "Stop Eating" : "Start Eating"}</Text>
+          </TouchableOpacity>
         </SafeAreaView>
       </>
     );
