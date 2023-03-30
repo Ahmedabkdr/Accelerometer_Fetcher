@@ -137,14 +137,19 @@ const App = () => {
   const toggleEating = () => {
     if (isEating) {
       setIsEating(false);
+      RNFetchBlob.fs.writeStream(filePath2, 'utf8', true)
+      .then((stream) => {
+          stream.write(Date.now() + ",0" + '\n')
+          return stream.close()
+      });
     } else {
       setIsEating(true);
+      RNFetchBlob.fs.writeStream(filePath2, 'utf8', true)
+      .then((stream) => {
+          stream.write(Date.now() + ",1" + '\n')
+          return stream.close()
+      });
     }
-    RNFetchBlob.fs.writeStream(filePath2, 'utf8', true)
-    .then((stream) => {
-        stream.write(Date.now() + "," + (isEating ? "1" : "0") + '\n')
-        return stream.close()
-    });
   };
 
   const goToPeripheral = (peripheral, navigation) => {
